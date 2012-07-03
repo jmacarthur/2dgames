@@ -1,4 +1,4 @@
-# Grid-based platform game skeleton by Jim MacArthur                           
+# Object Collector 2D, platform game example by Jim MacArthur                  
 
 import pygame
 from pygame.locals import *
@@ -9,9 +9,9 @@ screen = pygame.display.set_mode((screenwidth,256))
 pygame.display.set_caption('Object collector 2D')
 clock = pygame.time.Clock()
 
-BS = 16  # Block size (in pixels)
-GSY = 16 # Grid size (in blocks)
-GSX = 32
+BS = 16 # Block size (in pixels)
+GSY= 16 # Grid size (in blocks)
+GSX= 32
 
 def makegrid(x,y,default=0):
     v = [0]*y
@@ -19,14 +19,13 @@ def makegrid(x,y,default=0):
         v[i] = [default]*x
     return v
 
-# Load Level                                                                          
 blocks = makegrid(GSX,GSY)
 frame = makegrid(GSX,GSY)
 maxFrame = makegrid(GSX,GSY)
 startx = 0
 starty = 0              
 
-class Golem(object):
+class Golem(object): # This is the standard enemy
     def __init__(self,x,y):
         self.x = x
         self.y = y 
@@ -36,8 +35,7 @@ class Golem(object):
         self.frame = 0
     def animate(self):
         global blocks
-        if(self.left): self.x -= 1
-        else: self.x += 1
+        self.x += -1 if self.left else 1
         if(blocks[self.y/BS][self.x/BS]==8): self.left = not self.left
         self.frame = (self.frame+1)%2
     def overlaps(self,x,y,w,h):
@@ -48,7 +46,7 @@ class Golem(object):
         if(y + h + tolerance < self.y): return False
         return True
 
-def loadLevel(filename):
+def loadLevel(filename): # Loads a level from a text file into blocks etc
     global blocks, startx, starty,toCollect
     fp = open(filename,'r')
     y = 0
@@ -72,7 +70,7 @@ def loadLevel(filename):
         l = fp.readline()
         y+=1
 
-def touchingBlocks(x,y):
+def touchingBlocks(x,y): # List of blocks a player at x,y touches
     sgx = x/BS
     egx = (x+BS-1)/BS
     sgy = y/BS
@@ -149,7 +147,7 @@ def loadSpriteSet(name):
             return spriteArray
     return None
 
-def drawBlock(blockNo, x, y):    
+def drawBlock(blockNo, x, y):
     if(spritesByNumber[blockNo] is not None):
         spriteData = spritesByNumber[blockNo]
         if(type(spriteData) is list):
@@ -176,7 +174,7 @@ def standingEffects():
             if canEnter(px+1,py):
                 px += 1
 
-# per-play initialization things
+# Per-life initialization things
 def perLifeInit():
     global grounded, vel, walkframe, left, dx, px, py, collections, actives, frame, level
     actives = []
@@ -191,6 +189,7 @@ def perLifeInit():
     py = starty*BS
     collections = 0
 
+# Per-game initialization
 def perGameInit():
     global lives, level, flash
     flash = 0
