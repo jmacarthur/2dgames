@@ -9,6 +9,13 @@ screen = pygame.display.set_mode((screenwidth,256))
 pygame.display.set_caption('Object collector 2D')
 clock = pygame.time.Clock()
 
+# Background is only used during the game over screen
+background = pygame.surface.Surface((screenwidth,256))
+
+# Black is used to fade the background for the game over screen
+black = background.copy()
+black.fill((16,16,16))
+
 BS = 16 # Block size (in pixels)
 GSY= 16 # Grid size (in blocks)
 GSX= 32
@@ -284,7 +291,8 @@ def displayPlayScreen():
         screen.blit(playerSprites[0],(i*BS,14*BS))
 
 def displayGameOverScreen():
-    screen.fill((0,0,0))
+    background.blit(black, (0,0), None, BLEND_SUB)
+    screen.blit(background,(0,0))
     text = font.render("GAME OVER", 1, (255,0,0))
     textpos = text.get_rect(centerx=screenwidth/2,y=64)
     screen.blit(text, textpos)
@@ -309,15 +317,16 @@ def getMaxFrame(sym):
     return maxFrame[n]
 
 def checkDead(deadFlag):
-    global flash, lives, state
+    global flash, lives, state, background
     if(deadFlag or isDeadly(px,py)):
         lives -= 1
         if(lives < 0):
             state = GAMEOVER
             perGameInit()
+            background.blit(screen, (0,0))
         perLifeInit()
         flash = 2
-
+    
 font = pygame.font.Font(None, 36)
 symbolToNumber = { '#':1, '=':2, '~':3, '>':4, 't':5, ',': 6, 'o': 7,
                    '|': 8, 'e':9}
