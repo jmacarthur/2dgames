@@ -54,6 +54,14 @@ class Golem(object): # This is the standard enemy
         if(y + h + tolerance < self.y): return False
         return True
 
+class GolemVert(Golem): # This is the standard enemy
+    def animate(self):
+        global blocks
+        self.y += -1 if self.left else 1
+        if(blocks[self.y/BS][self.x/BS]==symbolToNumber['|']):
+            self.left = not self.left
+        self.frame = (self.frame+1)%2
+
 def loadLevel(filename): # Loads a level from a text file into blocks etc
     global blocks, startx, starty,toCollect
     fp = open(filename,'r')
@@ -66,9 +74,12 @@ def loadLevel(filename): # Loads a level from a text file into blocks etc
                 blocks[y][x] = 0
                 startx =x
                 starty =y
-            if(l[x] == 'g'):
+            elif(l[x] == 'g'):
                 blocks[y][x] = 0
                 actives.append(Golem(x*BS,y*BS))
+            elif(l[x] == 's'):
+                blocks[y][x] = 0
+                actives.append(GolemVert(x*BS,y*BS))
             elif(symbolToNumber.has_key(l[x])):
                 blocks[y][x] = symbolToNumber[l[x]]
             else:
