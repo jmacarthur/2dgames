@@ -36,7 +36,8 @@ class Golem(object): # This is the standard enemy
     def animate(self):
         global blocks
         self.x += -1 if self.left else 1
-        if(blocks[self.y/BS][self.x/BS]==8): self.left = not self.left
+        if(blocks[self.y/BS][self.x/BS]==symbolToNumber['|']):
+            self.left = not self.left
         self.frame = (self.frame+1)%2
     def overlaps(self,x,y,w,h):
         tolerance = -3
@@ -355,7 +356,7 @@ state = TITLE
 flash = 0
 gameOverTimeout = 32    
 
-while 1:
+while True:
     clock.tick(25)
 
     if state==PLAYING:
