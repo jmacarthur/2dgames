@@ -162,6 +162,8 @@ def drawBlock(blockNo, x, y):
             screen.blit(spriteData[frame[y][x]], (x*BS-px+10*BS,y*BS-py+6*BS))
             if blockNo == symbolToNumber['>']:
                 frame[y][x] = (frame[y][x]+1) % (getMaxFrame('>')+1)
+            if blockNo == symbolToNumber['<']:
+                frame[y][x] = (frame[y][x]-1) % (getMaxFrame('<')+1)
         else:
             screen.blit(spriteData, (x*BS-px+10*BS,y*BS-py+6*BS))
 
@@ -181,6 +183,9 @@ def standingEffects():
         elif blocks[gy][x] == symbolToNumber['>']:
             if canEnter(px+1,py):
                 px += 1
+        elif blocks[gy][x] == symbolToNumber['<']:
+            if canEnter(px-1,py):
+                px -= 1
 
 # Per-life initialization things
 def perLifeInit():
@@ -329,17 +334,17 @@ def checkDead(deadFlag):
     
 font = pygame.font.Font(None, 36)
 symbolToNumber = { '#':1, '=':2, '~':3, '>':4, 't':5, ',': 6, 'o': 7,
-                   '|': 8, 'e':9}
+                   '|': 8, 'e':9, '<':10 }
 blockSpriteMap = { '=':'ledge', '#':'wall', '~':'breakingledge', '>':'convey',
                    't':'tree', ',':'stalactite', 'o':'key',
-                   '|':None, 'e':'exit'}
+                   '|':None, 'e':'exit', '<':'convey' }
 
-spritesByNumber = [ None ] *10
-solid = [ 0 ] * 10
+spritesByNumber = [ None ] *12
+solid = [ 0 ] * 12
 
-for i in "=#~>":
+for i in "=#~><":
     solid [ symbolToNumber[i] ] = 1
-deadly = [ 0 ] * 10
+deadly = [ 0 ] * 12
 for i in "t,":
     deadly [ symbolToNumber[i] ] = 1
 
