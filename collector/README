@@ -1,0 +1,11 @@
+Object Collector 2D, a demonstration of PyGame as a platform game. 
+
+You will need Python (I tested with 2.7; other versions may work) and PyGame 
+(http://pygame.org/).
+
+If those are installed, run "python collector.py" to start. 
+
+This is intended as a demonstration, or a starting point for other
+developments, not a full game. The second level cannot be completed (as there
+is no level 3).
+
