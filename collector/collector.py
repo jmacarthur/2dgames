@@ -54,7 +54,7 @@ class Golem(object): # This is the standard enemy
         if(y + h + tolerance < self.y): return False
         return True
 
-class GolemVert(Golem): # This is the standard enemy
+class GolemVert(Golem): # Vertical-moving version
     def animate(self):
         global blocks
         self.y += -1 if self.left else 1
@@ -345,24 +345,22 @@ def checkDead(deadFlag):
     
 font = pygame.font.Font(None, 36)
 symbolToNumber = { '#':1, '=':2, '~':3, '>':4, 't':5, ',': 6, 'o': 7,
-                   '|': 8, 'e':9, '<':10 }
-blockSpriteMap = { '=':'ledge', '#':'wall', '~':'breakingledge', '>':'convey',
-                   't':'tree', ',':'stalactite', 'o':'key',
-                   '|':None, 'e':'exit', '<':'convey' }
+                   '|':8, 'e':9, '<':10 }
+blockSpriteMap = { '=':'ledge',  '#':'wall', '~':'breakingledge',
+                   '>':'convey', 't':'tree', ',':'stalactite', 
+                   'o':'key',    '|':None,   'e':'exit', '<':'convey' }
 
 spritesByNumber = [ None ] *12
 flags = [ 0 ] * 12
 
-SOLID = 1
-DEADLY = 2
-SUPPORTING = 4
+SOLID = 1 ; DEADLY = 2 ; SUPPORTING = 4
 
-for i in "#":
-    flags [ symbolToNumber[i] ] |= SOLID
-for i in "t,":
-    flags [ symbolToNumber[i] ] |= DEADLY
-for i in "#=~,<>":
-    flags [ symbolToNumber[i] ] |= SUPPORTING
+flagSetting = { "#": SOLID, "t,": DEADLY,
+                "#=~,<>": SUPPORTING }
+
+for (k,v) in flagSetting.iteritems():
+    for i in k:
+        flags [ symbolToNumber[i] ] |= v
 
 for k,v in blockSpriteMap.iteritems():
     n = symbolToNumber[k]
