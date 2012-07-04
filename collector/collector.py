@@ -104,7 +104,7 @@ def canEnter(x,y): # True if the player can exist at (x,y) without being inside 
     global blocks
     if(x<0 or y<0): return False
     for (gx,gy) in touchingBlocks(x,y):
-        if(blocks[gy][gx]==1): 
+        if(solid[blocks[gy][gx]]): 
             return False
     return True
 
@@ -136,7 +136,7 @@ def checkExit(x,y):
                 level += 1
                 perLifeInit()
 
-def canDrop(x,y): # Like isSolid, but only checks if we can drop into a space (many platform blocks can be entered but not dropped through)
+def canDrop(x,y): # Like canEnter, but only checks if we can drop into a space (many platform blocks can be entered but not dropped through)
     global blocks
     if(x<0 or y<0): return False
     if(y%BS != 0): return True
@@ -145,7 +145,7 @@ def canDrop(x,y): # Like isSolid, but only checks if we can drop into a space (m
     egy = (y+1+BS*2-1)/BS
     gy = egy
     for gx in range(sgx,egx+1):
-        if(solid[blocks[gy][gx]]): 
+        if(supporting[blocks[gy][gx]]): 
             return False
     return True
 
@@ -352,12 +352,15 @@ blockSpriteMap = { '=':'ledge', '#':'wall', '~':'breakingledge', '>':'convey',
 
 spritesByNumber = [ None ] *12
 solid = [ 0 ] * 12
-
-for i in "=#~><":
-    solid [ symbolToNumber[i] ] = 1
+supporting = [ 0 ] * 12
 deadly = [ 0 ] * 12
+
+for i in "#":
+    solid [ symbolToNumber[i] ] = 1
 for i in "t,":
     deadly [ symbolToNumber[i] ] = 1
+for i in "#=~,<>":
+    supporting [ symbolToNumber[i] ] = 1
 
 for k,v in blockSpriteMap.iteritems():
     n = symbolToNumber[k]
@@ -415,3 +418,5 @@ while True:
                 state = PLAYING
                 perGameInit()
                 perLifeInit()
+            elif event.key == K_p: # Cheat code, skips all collections
+                collections = 100
