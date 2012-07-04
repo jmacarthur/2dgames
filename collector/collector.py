@@ -104,7 +104,7 @@ def canEnter(x,y): # True if the player can exist at (x,y) without being inside 
     global blocks
     if(x<0 or y<0): return False
     for (gx,gy) in touchingBlocks(x,y):
-        if(solid[blocks[gy][gx]]): 
+        if(flags[blocks[gy][gx]] & SOLID): 
             return False
     return True
 
@@ -112,7 +112,7 @@ def isDeadly(x,y):
     global blocks
     if(x<0 or y<0): return False
     for (gx,gy) in touchingBlocks(x,y):
-        if(deadly[blocks[gy][gx]]): 
+        if(flags[blocks[gy][gx]] & DEADLY): 
             return True
     for a in actives:
         if(a.overlaps(x,y,16,32)):
@@ -145,7 +145,7 @@ def canDrop(x,y): # Like canEnter, but only checks if we can drop into a space (
     egy = (y+1+BS*2-1)/BS
     gy = egy
     for gx in range(sgx,egx+1):
-        if(supporting[blocks[gy][gx]]): 
+        if(flags[blocks[gy][gx]] & SUPPORTING): 
             return False
     return True
 
@@ -351,16 +351,18 @@ blockSpriteMap = { '=':'ledge', '#':'wall', '~':'breakingledge', '>':'convey',
                    '|':None, 'e':'exit', '<':'convey' }
 
 spritesByNumber = [ None ] *12
-solid = [ 0 ] * 12
-supporting = [ 0 ] * 12
-deadly = [ 0 ] * 12
+flags = [ 0 ] * 12
+
+SOLID = 1
+DEADLY = 2
+SUPPORTING = 4
 
 for i in "#":
-    solid [ symbolToNumber[i] ] = 1
+    flags [ symbolToNumber[i] ] |= SOLID
 for i in "t,":
-    deadly [ symbolToNumber[i] ] = 1
+    flags [ symbolToNumber[i] ] |= DEADLY
 for i in "#=~,<>":
-    supporting [ symbolToNumber[i] ] = 1
+    flags [ symbolToNumber[i] ] |= SUPPORTING
 
 for k,v in blockSpriteMap.iteritems():
     n = symbolToNumber[k]
