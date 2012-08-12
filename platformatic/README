@@ -1,9 +1,9 @@
 Platformatic 2D, a demo Puzzle/Platform game. 
 
 You will need Python (I tested with 2.7; other versions may work) and PyGame 
-(http://pygame.org/).
+(http://pygame.org/) and Perl.
 
-If those are installed, run "python main.py" to start. 
+If those are installed, run "./levelconverter.pl" then "python main.py" to start. 
 
 This is intended as a demonstration, or a starting point for other
 developments, not a full game. I don't believe level four can be completed, but it may be possible.
