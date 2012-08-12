@@ -597,7 +597,6 @@ def mainLoop():
             pygame.display.flip()
 
         for event in pygame.event.get():
-            print "Verify event"
 
             if event.type == QUIT:
                 exit(0)
