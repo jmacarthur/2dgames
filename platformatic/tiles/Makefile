@@ -1,0 +1,2 @@
+tiles: 
+	montage -tile x1 -geometry +0+0 blank.png platform.png platforml.png platformr.png exitsign.png exit.png player.png wall.png wallt.png wallb.png updownmonster.png leftrightmonster.png tileset1.png
