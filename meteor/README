@@ -1,0 +1,7 @@
+Meteor Miner, a PyGame demo by Jim MacArthur.
+
+Controls are shown on the title page. Navigate through the passages in the meteor, collecting the orbs of ore. Fly up and away from the asteroid to escape to the next one. 
+
+There are three levels and they are all definitely completable, although it isn't guaranteed that you will be able to get all the ore from each level. Ore makes you heavier, so at some point you won't be able to escape the meteor's gravity.
+
+Run "./levelconverter.pl" then "python meteor.py" to start it.

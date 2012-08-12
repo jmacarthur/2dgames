@@ -1,0 +1,28 @@
+blocktypes = {
+"empty" : 0,
+"block1": 1,
+"block2": 2,
+"block3": 3,
+"block4": 4,
+"block5": 5,
+"block6": 6,
+"block7": 7,
+"block8": 8,
+"blockb": 9,
+"blockl": 10,
+"blockr": 11,
+"blockt": 12,
+"pylont": 13,
+"pylonb": 14,
+"generator": 15,
+"sparkv": 16,
+"sparkv1": 17,
+"soilmetal": 18,
+"rustpanel1": 19,
+"rustpanel2": 20,
+"brokengenerator": 21,
+"metalsoil2": 22,
+"goldore": 23,
+"gold": 24
+}
+
