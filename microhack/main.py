@@ -37,9 +37,6 @@ teleporters = None
 objects = { }
 enemyList = []
 
-def canMove(xpos, ypos):
-    return (level1world[ypos][xpos] in enterable)
-
 def cutScene(filename):
     global screen
     img = pygame.transform.scale(pygame.image.load(filename+".png"), (32*9,32*9))
@@ -68,6 +65,7 @@ class Entity:
         self.gold = 0
         self.team = "evil"
         self.attack = 1
+        self.magic = 5
     def getColour(self):
         halfHP = self.maxHP/2
         if(self.HP < halfHP):
@@ -189,6 +187,26 @@ def getKeypress():
             else:
                 return event.key
 
+def fireBeam(entity):
+    x = entity.x
+    y = entity.y
+    (dx,dy) = directions[entity.dir]
+    print "Firing beam from %d,%d in dir (%d,%d)"%(x,y,dx,dy)
+
+    while True:
+        x += dx
+        y += dy
+        print "Trying %d,%d"%(x,y)
+        if(level1world[y][x] in enterable):
+            c = contents(x,y)
+            if(c is not None):
+                print "Hit an entity"
+                c.HP -= 5
+                return
+        else:
+            print "Hit a wall"
+            return
+
 def main():
     pygame.init()
     global moved, enemyList, level1world, teleporters, objects, screen
@@ -224,6 +242,12 @@ def main():
             pygame.draw.rect(screen, e.getColour(), ((e.x-xpos+4)*32,(e.y-ypos+4)*32,32,32))
         pygame.display.flip()
         key = getKeypress()
-        if key in directions: playerMove(directions[key])
-
+        if key in directions: 
+            playerMove(directions[key])
+            player.dir = key
+        elif key == K_SPACE:
+            if(player.magic>0):
+                #player.magic -= 1
+                fireBeam(player)
+                moved = True
 main()
