@@ -193,6 +193,7 @@ def main():
     pygame.init()
     global moved, enemyList, level1world, teleporters, objects, screen
     screen = pygame.display.set_mode((32*9, 32*9))
+    pygame.display.set_caption("MicroHack")
     clock = pygame.time.Clock()
     moved = False
     (level1world,(teleporters,objects)) = readMap("level1.tmx")

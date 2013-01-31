@@ -1,0 +1,9 @@
+MicroHack is a reimplementation of Rob Beschizza's TinyHack in PyGame by Jim MacArthur.
+
+You'll need PyGame installed. Type 'python main.py' to start.
+
+You control the brave pixel in the centre of the screen using the arrow keys. Run into monsters (other moving green pixels) to attack them. As you are injured, your pixel will change from green to yellow and finally red before you die. Buildings or dungeons are marked by red pixels - find the village pub near where you start to replenish your health.
+
+You can leave the island at any time by returning to the jetty, but try to leave with all 12 gold pieces and the sword and shield.
+
+Press 'q' or Escape at any time to quit the game.
