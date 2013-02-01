@@ -65,7 +65,7 @@ class Entity:
         self.gold = 0
         self.team = "evil"
         self.attack = 1
-        self.magic = 5
+        self.magic = 0
     def getColour(self):
         halfHP = self.maxHP/2
         if(self.HP < halfHP):
@@ -128,6 +128,10 @@ def activateTeleporter(entity,x,y):
             cutScene("win")
             print "You escaped the island with %d gold"%entity.gold
             exit(0);
+        if(desty == 3): # Magicshop
+            sound("door")
+            cutScene("magic")
+            entity.magic = 1
     else:
         sound("door")
         (entity.x,entity.y) = (destx,desty)
@@ -247,7 +251,7 @@ def main():
             player.dir = key
         elif key == K_SPACE:
             if(player.magic>0):
-                #player.magic -= 1
+                player.magic -= 1
                 fireBeam(player)
                 moved = True
 main()

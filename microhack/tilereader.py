@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 TILELAYER = "world"
 OBJECTLAYER = "objects"
 TILESIZE = 32
-actionMap = { "pub": 1, "exit": 2 }
+actionMap = { "pub": 1, "exit": 2, "magicshop": 3 }
 
 def processTileLayer(layer):
     mapData = []
