@@ -66,12 +66,17 @@ class Entity:
         self.team = "evil"
         self.attack = 1
         self.magic = 0
+        self.animating = False
     def getColour(self):
         halfHP = self.maxHP/2
         if(self.HP < halfHP):
             return (255,255*self.HP/halfHP,0)
         else:
             return (255*(self.maxHP-self.HP)/halfHP,255,0)
+    def startAnimation(self):
+        self.animating = True
+    def finishedAnimation(self):
+        self.animating = False
 
 def lift(enemyList):
     for y in range(0,len(level1world)):
@@ -141,10 +146,11 @@ def attack(attacker, defender):
     sound("punch")
     
 def playerMove((dx,dy)):
-    global moved, enemyList
+    global moved, enemyList, animations
     player = enemyList[0]
     c = contents(player.x+dx,player.y+dy)
     if(canMove(player.x+dx,player.y+dy)):
+        animations.append(SlideAnimation(player.x*32,player.y*32,dx*32,dy*32,250.0,player,player.getColour()))
         player.x+=dx
         player.y+=dy
         if level1world[player.y][player.x]==tiles.GOLD:
@@ -224,11 +230,11 @@ class Animation(object):
         self.active = False
     def draw(self,surface,xoff,yoff):
         pygame.draw.circle(surface, (255,255,255), (16+xoff,16+yoff), 16, 2)
-    def animate(self, elapsedms):
+    def elapsed(self, elapsedms):
         pass
 
 class SlideAnimation(Animation):
-    def __init__(self,x,y,dx,dy, time = 1.0):
+    def __init__(self,x,y,dx,dy, time = 1000.0,entity=None,colour=(255,0,255)):
         self.startx = x
         self.starty = y
         self.x = x
@@ -238,16 +244,22 @@ class SlideAnimation(Animation):
         self.maxtime = time
         self.currenttime = 0
         self.active = True
+        self.entity = entity
+        self.colour = colour
+        if(entity): entity.startAnimation()
     def draw(self,surface,xoff,yoff):
-        pygame.draw.rect(surface, (255,0,255), (self.x+xoff,self.y+yoff,32,32))
-    def animate(self, elapsedms):
+        print "Drawing animation at %d,%d"%(self.x,self.y)
+        pygame.draw.rect(surface, self.colour, (self.x+xoff,self.y+yoff,32,32))
+    def elapsed(self, elapsedms):
         self.currenttime += elapsedms
         if(self.currenttime >= self.maxtime):
+            if(self.active and self.entity):
+                self.entity.finishedAnimation()
             self.active = False
             self.currenttime = self.maxtime
-        self.x = self.startx + (self.currenttime/self.maxtime)*self.dx
-        self.y = self.starty + (self.currenttime/self.maxtime)*self.dy
-   
+        self.x = self.startx + self.currenttime*self.dx/self.maxtime
+        self.y = self.starty + self.currenttime*self.dy/self.maxtime
+  
 
 def main():
     pygame.init()
@@ -265,14 +277,14 @@ def main():
     animating = False
     animations = []
     oldTime = time.time()
+    key = None
     while True:
-        screen.fill((0,0,0))
         currentTime = time.time()
         elapsedms = (currentTime - oldTime)*1000
+        print "%f ms elapsed"%elapsedms
         oldTime = currentTime
         for a in animations:
             a.elapsed(elapsedms)
-        (xpos,ypos) = (enemyList[0].x,enemyList[0].y)
         if(enemyList[0].HP<=0):
             sound("fail")
             cutScene("lose")
@@ -280,25 +292,7 @@ def main():
             return
         enemyList = filter(alive,enemyList)
         animations = filter(activeAnimation, animations)
-        if(moved):
-            monMove(enemyList)
-            moved = False
-        for x in range(0,9):
-            for y in range(0,9):
-                val = level1world[y+ypos-4][x+xpos-4]
-                if(val>0): col = cols[val-1]
-                else: col = (0,0,0)
-                pygame.draw.rect(screen, col, (x*32,y*32,32,32))
-        for e in enemyList:
-            pygame.draw.rect(screen, e.getColour(), ((e.x-xpos+4)*32,(e.y-ypos+4)*32,32,32))
-        if(player.magic > 0):
-            pygame.draw.rect(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), (8*32,0,32,32))
-        pygame.display.flip()
 
-        if(animating):
-            key = pollForKeypress()
-        else:
-            key = waitForKeypress()            
         if key in directions: 
             playerMove(directions[key])
             # Note that we set direction whether or not the move succeeded.
@@ -308,4 +302,33 @@ def main():
             if(player.magic>0):
                 player.magic -= 1
                 fireBeam(player)
+        if(moved):
+            monMove(enemyList)
+            moved = False
+
+        (xpos,ypos) = (enemyList[0].x,enemyList[0].y)
+
+        # Draw section
+        screen.fill((0,0,0))
+        for x in range(0,9):
+            for y in range(0,9):
+                val = level1world[y+ypos-4][x+xpos-4]
+                if(val>0): col = cols[val-1]
+                else: col = (0,0,0)
+                pygame.draw.rect(screen, col, (x*32,y*32,32,32))
+        for e in enemyList:
+            if not e.animating:
+                pygame.draw.rect(screen, e.getColour(), ((e.x-xpos+4)*32,(e.y-ypos+4)*32,32,32))
+        if(player.magic > 0):
+            pygame.draw.rect(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), (8*32,0,32,32))
+        for a in animations:
+            a.draw(screen,-xpos*32+4*32,-ypos*32+4*32)
+        pygame.display.flip()
+        
+        if(len(animations)>0):            
+            #key = pollForKeypress()
+            key = None
+            pass
+        else:
+            key = waitForKeypress()            
 main()
