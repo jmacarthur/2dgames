@@ -111,10 +111,10 @@ def monMove(enemyList):
     for e in enemyList[1:]:
         dx = xpos-e.x
         dy = ypos-e.y
-        if(dx>0 and attemptMonsterMove(e,1,0)): return
-        elif(dx<0 and attemptMonsterMove(e,-1,0)): return
-        elif(dy>0 and attemptMonsterMove(e,0,1)): return
-        elif(dy<0 and attemptMonsterMove(e,0,-1)): return
+        if(dx>0 and attemptMonsterMove(e,1,0)): continue
+        elif(dx<0 and attemptMonsterMove(e,-1,0)): continue
+        elif(dy>0 and attemptMonsterMove(e,0,1)): continue
+        elif(dy<0 and attemptMonsterMove(e,0,-1)): continue
 
 def activateTeleporter(entity,x,y):
     (destx, desty) = teleporters[(x,y)]
