@@ -4,7 +4,7 @@
 
 import pygame
 from pygame.locals import *
-
+import time
 from tilereader import readMap
 import random
 
@@ -179,6 +179,7 @@ def playerMove((dx,dy)):
         moved = True
 
 def alive(e): return e.HP>0
+def activeAnimation(a): return a.active
 
 def pollForKeypress():
     event = pygame.event.poll()
@@ -218,9 +219,39 @@ def fireBeam(entity):
         else:
             return
 
+class Animation(object):
+    def __init__(self):
+        self.active = False
+    def draw(self,surface,xoff,yoff):
+        pygame.draw.circle(surface, (255,255,255), (16+xoff,16+yoff), 16, 2)
+    def animate(self, elapsedms):
+        pass
+
+class SlideAnimation(Animation):
+    def __init__(self,x,y,dx,dy, time = 1.0):
+        self.startx = x
+        self.starty = y
+        self.x = x
+        self.y = y
+        self.dx = dx
+        self.dy = dy
+        self.maxtime = time
+        self.currenttime = 0
+        self.active = True
+    def draw(self,surface,xoff,yoff):
+        pygame.draw.rect(surface, (255,0,255), (self.x+xoff,self.y+yoff,32,32))
+    def animate(self, elapsedms):
+        self.currenttime += elapsedms
+        if(self.currenttime >= self.maxtime):
+            self.active = False
+            self.currenttime = self.maxtime
+        self.x = self.startx + (self.currenttime/self.maxtime)*self.dx
+        self.y = self.starty + (self.currenttime/self.maxtime)*self.dy
+   
+
 def main():
     pygame.init()
-    global moved, enemyList, level1world, teleporters, objects, screen
+    global moved, enemyList, level1world, teleporters, objects, screen, animations
     screen = pygame.display.set_mode((32*9, 32*9))
     pygame.display.set_caption("MicroHack")
     clock = pygame.time.Clock()
@@ -232,8 +263,15 @@ def main():
     enemyList = [player]
     lift(enemyList)
     animating = False
+    animations = []
+    oldTime = time.time()
     while True:
         screen.fill((0,0,0))
+        currentTime = time.time()
+        elapsedms = (currentTime - oldTime)*1000
+        oldTime = currentTime
+        for a in animations:
+            a.elapsed(elapsedms)
         (xpos,ypos) = (enemyList[0].x,enemyList[0].y)
         if(enemyList[0].HP<=0):
             sound("fail")
@@ -241,6 +279,7 @@ def main():
             print "Player killed"
             return
         enemyList = filter(alive,enemyList)
+        animations = filter(activeAnimation, animations)
         if(moved):
             monMove(enemyList)
             moved = False
