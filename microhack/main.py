@@ -30,6 +30,8 @@ enterable = [ tiles.GRAY1, tiles.GRASS, tiles.DARKGRASS, tiles.GOLD, tiles.OBJEC
 
 directions = { K_LEFT: (-1,0), K_RIGHT: (1,0), K_UP: (0,-1), K_DOWN: (0,1) }
 
+TILESIZE = 32
+
 # Other globals that will be set up in initialization
 sounds = {}
 level1world = None
@@ -66,17 +68,24 @@ class Entity:
         self.team = "evil"
         self.attack = 1
         self.magic = 0
-        self.animating = False
+        self.animation = None
     def getColour(self):
         halfHP = self.maxHP/2
-        if(self.HP < halfHP):
+        if(self.HP <= 0):
+            return (255,0,0)
+        elif(self.HP < halfHP):
             return (255,255*self.HP/halfHP,0)
         else:
             return (255*(self.maxHP-self.HP)/halfHP,255,0)
-    def startAnimation(self):
-        self.animating = True
+    def startAnimation(self,animation):
+        self.animation = animation
     def finishedAnimation(self):
-        self.animating = False
+        self.animation = None
+    def getScreenPos(self):
+        if(self.animation is None):
+            return (self.x*TILESIZE,self.y*TILESIZE)
+        else:
+            return self.animation.getScreenPos()
 
 def lift(enemyList):
     for y in range(0,len(level1world)):
@@ -246,10 +255,11 @@ class SlideAnimation(Animation):
         self.active = True
         self.entity = entity
         self.colour = colour
-        if(entity): entity.startAnimation()
+        if(entity): entity.startAnimation(self)
     def draw(self,surface,xoff,yoff):
-        print "Drawing animation at %d,%d"%(self.x,self.y)
         pygame.draw.rect(surface, self.colour, (self.x+xoff,self.y+yoff,32,32))
+    def getScreenPos(self):
+        return (self.x,self.y)
     def elapsed(self, elapsedms):
         self.currenttime += elapsedms
         if(self.currenttime >= self.maxtime):
@@ -281,17 +291,9 @@ def main():
     while True:
         currentTime = time.time()
         elapsedms = (currentTime - oldTime)*1000
-        print "%f ms elapsed"%elapsedms
         oldTime = currentTime
         for a in animations:
             a.elapsed(elapsedms)
-        if(enemyList[0].HP<=0):
-            sound("fail")
-            cutScene("lose")
-            print "Player killed"
-            return
-        enemyList = filter(alive,enemyList)
-        animations = filter(activeAnimation, animations)
 
         if key in directions: 
             playerMove(directions[key])
@@ -306,23 +308,34 @@ def main():
             monMove(enemyList)
             moved = False
 
-        (xpos,ypos) = (enemyList[0].x,enemyList[0].y)
+        if(enemyList[0].HP<=0):
+            sound("fail")
+            cutScene("lose")
+            print "Player killed"
+            return
+        enemyList = filter(alive,enemyList)
+        animations = filter(activeAnimation, animations)
 
+
+        (xpos,ypos) = (enemyList[0].getScreenPos())
+
+        xgrid = int(xpos/TILESIZE)
+        ygrid = int(ypos/TILESIZE)
         # Draw section
         screen.fill((0,0,0))
-        for x in range(0,9):
-            for y in range(0,9):
-                val = level1world[y+ypos-4][x+xpos-4]
+        for x in range(xgrid,xgrid+10):
+            for y in range(ygrid,ygrid+10):
+                val = level1world[y-4][x-4]
                 if(val>0): col = cols[val-1]
                 else: col = (0,0,0)
-                pygame.draw.rect(screen, col, (x*32,y*32,32,32))
+                pygame.draw.rect(screen, col, (x*32-xpos,y*32-ypos,32,32))
         for e in enemyList:
-            if not e.animating:
-                pygame.draw.rect(screen, e.getColour(), ((e.x-xpos+4)*32,(e.y-ypos+4)*32,32,32))
+            if e.animation==None:
+                pygame.draw.rect(screen, e.getColour(), ((e.x+4)*32-xpos,(e.y+4)*32-ypos,32,32))
         if(player.magic > 0):
             pygame.draw.rect(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), (8*32,0,32,32))
         for a in animations:
-            a.draw(screen,-xpos*32+4*32,-ypos*32+4*32)
+            a.draw(screen,-xpos+4*32,-ypos+4*32)
         pygame.display.flip()
         
         if(len(animations)>0):            
