@@ -116,7 +116,7 @@ def canMove(x,y):
 
 def attemptMonsterMove(entity, dx, dy):
     if(canMove(entity.x+dx,entity.y+dy)): 
-        animations.append(SlideAnimation(entity.x*32,entity.y*32,dx*32,dy*32,250.0,entity,entity.getColour()))
+        animations.append(SlideAnimation(entity.x*32,entity.y*32,dx*32,dy*32,125.0,entity,entity.getColour()))
         entity.x += dx
         entity.y += dy
         return True
@@ -172,7 +172,7 @@ def playerMove((dx,dy)):
     player = enemyList[0]
     c = contents(player.x+dx,player.y+dy)
     if(canMove(player.x+dx,player.y+dy)):
-        animations.append(SlideAnimation(player.x*32,player.y*32,dx*32,dy*32,250.0,player,player.getColour()))
+        animations.append(SlideAnimation(player.x*32,player.y*32,dx*32,dy*32,125.0,player,player.getColour()))
         player.x+=dx
         player.y+=dy
         if level1world[player.y][player.x]==tiles.GOLD:
@@ -242,9 +242,15 @@ def fireBeam(entity):
         if(level1world[y][x] in enterable):
             c = contents(x,y)
             if(c is not None):
+                leftdx = -dy
+                leftdy = dx
+                animations.append(ProjAnimation(entity.x*32+16-4,entity.y*32+16-4,(c.x-entity.x)*32,(c.y-entity.y)*32,150.0,None,(255,255,0)))
                 c.HP -= 5
                 return
         else:
+            leftdx = -dy
+            leftdy = dx
+            animations.append(ProjAnimation(entity.x*32+16-4,entity.y*32+16-4,(x-entity.x)*32,(y-entity.y)*32,150.0,None,(255,255,0)))
             return
 
 class Animation(object):
