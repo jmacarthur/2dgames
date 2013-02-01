@@ -195,20 +195,16 @@ def fireBeam(entity):
     x = entity.x
     y = entity.y
     (dx,dy) = directions[entity.dir]
-    print "Firing beam from %d,%d in dir (%d,%d)"%(x,y,dx,dy)
-
+    sound("magic")
     while True:
         x += dx
         y += dy
-        print "Trying %d,%d"%(x,y)
         if(level1world[y][x] in enterable):
             c = contents(x,y)
             if(c is not None):
-                print "Hit an entity"
                 c.HP -= 5
                 return
         else:
-            print "Hit a wall"
             return
 
 def main():
@@ -248,6 +244,7 @@ def main():
         key = getKeypress()
         if key in directions: 
             playerMove(directions[key])
+            # Note that we set direction whether or not the move succeeded.
             player.dir = key
         elif key == K_SPACE:
             if(player.magic>0):
