@@ -240,6 +240,8 @@ def main():
                 pygame.draw.rect(screen, col, (x*32,y*32,32,32))
         for e in enemyList:
             pygame.draw.rect(screen, e.getColour(), ((e.x-xpos+4)*32,(e.y-ypos+4)*32,32,32))
+        if(player.magic > 0):
+            pygame.draw.rect(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), (8*32,0,32,32))
         pygame.display.flip()
         key = getKeypress()
         if key in directions: 
