@@ -44,7 +44,7 @@ def cutScene(filename):
     backup.blit(screen,(0,0))
     screen.blit(img, (0,0))
     pygame.display.flip()
-    getKeypress()
+    waitForKeypress()
     screen.blit(backup,(0,0))
 
 def sound(filename):
@@ -180,7 +180,18 @@ def playerMove((dx,dy)):
 
 def alive(e): return e.HP>0
 
-def getKeypress():
+def pollForKeypress():
+    event = pygame.event.poll()
+    if event.type == QUIT:
+        exit(0)
+    elif event.type == KEYDOWN:
+        if event.key == K_ESCAPE or event.key == K_q:
+            exit(0)
+        else:
+            return event.key
+    return None
+
+def waitForKeypress():
     while(True):
         event = pygame.event.wait()
         if event.type == QUIT:
@@ -220,6 +231,7 @@ def main():
     player.attack = 2
     enemyList = [player]
     lift(enemyList)
+    animating = False
     while True:
         screen.fill((0,0,0))
         (xpos,ypos) = (enemyList[0].x,enemyList[0].y)
@@ -243,14 +255,18 @@ def main():
         if(player.magic > 0):
             pygame.draw.rect(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), (8*32,0,32,32))
         pygame.display.flip()
-        key = getKeypress()
+
+        if(animating):
+            key = pollForKeypress()
+        else:
+            key = waitForKeypress()            
         if key in directions: 
             playerMove(directions[key])
             # Note that we set direction whether or not the move succeeded.
             player.dir = key
         elif key == K_SPACE:
+            moved = True # Always mark moved, then space acts as a wait key if no magic
             if(player.magic>0):
                 player.magic -= 1
                 fireBeam(player)
-                moved = True
 main()
