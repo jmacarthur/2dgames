@@ -39,6 +39,11 @@ teleporters = None
 objects = { }
 enemyList = []
 
+def sgn(x):
+    if(x>0): return 1
+    elif(x<0): return -1
+    return 0
+
 def cutScene(filename):
     global screen
     img = pygame.transform.scale(pygame.image.load(filename+".png"), (32*9,32*9))
@@ -111,6 +116,7 @@ def canMove(x,y):
 
 def attemptMonsterMove(entity, dx, dy):
     if(canMove(entity.x+dx,entity.y+dy)): 
+        animations.append(SlideAnimation(entity.x*32,entity.y*32,dx*32,dy*32,250.0,entity,entity.getColour()))
         entity.x += dx
         entity.y += dy
         return True
@@ -152,6 +158,13 @@ def activateTeleporter(entity,x,y):
 
 def attack(attacker, defender):
     defender.HP -= random.randint(1,attacker.attack)
+    
+    dx = defender.x-attacker.x
+    dy = defender.y-attacker.y
+    leftdx = sgn(-dy)
+    leftdy = sgn(dx)
+
+    animations.append(ProjAnimation(attacker.x*32+16+16*leftdx-4,attacker.y*32+16+16*leftdy-4,(defender.x-attacker.x)*32,(defender.y-attacker.y)*32,150.0,None,(255,255,255)))
     sound("punch")
     
 def playerMove((dx,dy)):
@@ -271,6 +284,10 @@ class SlideAnimation(Animation):
         self.y = self.starty + self.currenttime*self.dy/self.maxtime
   
 
+class ProjAnimation(SlideAnimation):
+    def draw(self,surface,xoff,yoff):
+        pygame.draw.rect(surface, self.colour, (self.x+xoff,self.y+yoff,8,8))
+
 def main():
     pygame.init()
     global moved, enemyList, level1world, teleporters, objects, screen, animations
@@ -315,7 +332,6 @@ def main():
             return
         enemyList = filter(alive,enemyList)
         animations = filter(activeAnimation, animations)
-
 
         (xpos,ypos) = (enemyList[0].getScreenPos())
 
